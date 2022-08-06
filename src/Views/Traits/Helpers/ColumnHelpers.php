@@ -112,6 +112,9 @@ trait ColumnHelpers
      */
     public function getTable(): ?string
     {
+        if (Str::contains($this->table, ' as ')) {
+            return Str::after($this->table, ' as ');
+        }
         return $this->table;
     }
 
@@ -540,7 +543,7 @@ trait ColumnHelpers
             if (is_bool($attributes[$key])) {
                 return $attributes[$key] ? $key : '';
             }
-            
+
             return $key . '="' . $attributes[$key] . '"';
         }, array_keys($attributes)));
     }

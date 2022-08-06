@@ -5,6 +5,7 @@ namespace Rappasoft\LaravelLivewireTables\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 
 trait WithData
@@ -13,7 +14,7 @@ trait WithData
     public function getRows()
     {
         $this->baseQuery();
-        
+
         return $this->executeQuery();
     }
 
@@ -85,6 +86,12 @@ trait WithData
             }
 
             if ($table) {
+                $relationPartPlural = Str::plural($relationPart);
+                if ($table !== $relationPartPlural) {
+                    $orgTableName = $table;
+                    $table .= ' as '.$relationPartPlural;
+                    $other = str_replace($orgTableName.'.', $relationPartPlural.'.', $other);
+                }
                 $this->setBuilder($this->performJoin($table, $foreign, $other));
             }
 
@@ -133,6 +140,10 @@ trait WithData
 
             if ($model instanceof HasOne || $model instanceof BelongsTo) {
                 $table = $model->getRelated()->getTable();
+                $relationPartPlural = Str::plural($relationPart);
+                if ($table !== $relationPartPlural) {
+                    $table .= ' as '.$relationPartPlural;
+                }
             }
 
             $lastQuery = $model->getQuery();
